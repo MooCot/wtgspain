@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Imports\Ports;
+namespace App\Application\Offers\Ports;
 
 use App\Infrastructure\Persistence\Eloquent\Models\Offer;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;

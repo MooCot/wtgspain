@@ -4,8 +4,8 @@ namespace App\Application\Imports;
 
 use App\Application\Imports\Exceptions\InvalidOfferPayloadException;
 use App\Application\Imports\Ports\ImportRepository;
-use App\Application\Imports\Ports\OfferRepository;
-use App\Application\Imports\Ports\PropertyRepository;
+use App\Application\Offers\Ports\OfferRepository;
+use App\Application\Properties\Ports\PropertyRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Import;
 use App\Infrastructure\Persistence\Eloquent\Models\ImportStatus;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;

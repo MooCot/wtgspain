@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Persistence\Eloquent\Repositories;
 
-use App\Application\Imports\Ports\OfferRepository;
+use App\Application\Offers\Ports\OfferRepository;
 use App\Application\Reservations\Exceptions\OfferUnavailableException;
 use App\Application\Reservations\Ports\ReservationRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Offer;

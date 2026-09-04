@@ -2,7 +2,7 @@
 
 namespace App\Application\Properties;
 
-use App\Application\Imports\Ports\PropertyRepository;
+use App\Application\Properties\Ports\PropertyRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class SearchPropertiesUseCase

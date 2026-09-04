@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Imports\Ports;
+namespace App\Application\Properties\Ports;
 
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
