@@ -20,11 +20,13 @@ class Import extends Model
         'total_offers',
         'processed_offers',
         'error',
+        'started_at',
         'completed_at',
     ];
 
     protected $casts = [
         'sent_at' => 'datetime',
+        'started_at' => 'datetime',
         'completed_at' => 'datetime',
         'status' => ImportStatus::class,
     ];

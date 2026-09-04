@@ -51,6 +51,7 @@ class ImportsEndpointTest extends TestCase
         $this->assertSame(ImportStatus::Completed, $import->status);
         $this->assertSame(1, $import->total_offers);
         $this->assertSame(1, $import->processed_offers);
+        $this->assertNotNull($import->started_at);
         $this->assertDatabaseCount('properties', 1);
         $this->assertDatabaseCount('offers', 1);
     }

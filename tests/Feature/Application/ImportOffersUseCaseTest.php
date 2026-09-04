@@ -52,6 +52,20 @@ class ImportOffersUseCaseTest extends TestCase
         $this->assertDatabaseCount('properties', 1);
     }
 
+    public function testItRecordsStartedAtBeforeCompleting(): void
+    {
+        $supplier = Supplier::factory()->create();
+        $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
+
+        $offers = collect([$this->offerPayload(['external_id' => 'offer-a'])]);
+
+        $useCase = $this->app->make(ImportOffersUseCase::class);
+        $result = $useCase->handle($import, $supplier, $offers);
+
+        $this->assertNotNull($result->started_at);
+        $this->assertTrue($result->started_at->lessThanOrEqualTo($result->completed_at));
+    }
+
     public function testItReusesExistingPropertyByCode(): void
     {
         $supplier = Supplier::factory()->create();
@@ -84,6 +98,20 @@ class ImportOffersUseCaseTest extends TestCase
         $this->assertSame(ImportStatus::Failed, $result->status);
         $this->assertSame('Offer payload missing property data.', $result->error);
         $this->assertNotNull($result->completed_at);
+    }
+
+    public function testItRecordsStartedAtEvenWhenImportFails(): void
+    {
+        $supplier = Supplier::factory()->create();
+        $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
+
+        $offers = collect([$this->offerPayload(['property' => null])]);
+
+        $useCase = $this->app->make(ImportOffersUseCase::class);
+        $result = $useCase->handle($import, $supplier, $offers);
+
+        $this->assertNotNull($result->started_at);
+        $this->assertTrue($result->started_at->lessThanOrEqualTo($result->completed_at));
     }
 
     public function testItDoesNotSwallowProgrammerErrors(): void

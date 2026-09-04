@@ -26,6 +26,7 @@ class ImportResource extends JsonResource
             'processed_offers' => $this->processed_offers,
             'error' => $this->error,
             'created_at' => $this->created_at,
+            'started_at' => $this->started_at,
             'completed_at' => $this->completed_at,
         ];
     }

@@ -24,6 +24,11 @@ class ImportOffersUseCase
      */
     public function handle(Import $import, Supplier $supplier, Collection $offersPayload): Import
     {
+        $import = $this->imports->update($import, [
+            'status' => ImportStatus::Processing,
+            'started_at' => now(),
+        ]);
+
         $processed = 0;
 
         try {
