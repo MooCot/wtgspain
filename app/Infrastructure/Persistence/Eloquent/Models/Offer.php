@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Persistence\Eloquent\Models;
 
+use App\Infrastructure\Persistence\Eloquent\Models\Casts\DateOnlyCast;
 use App\Infrastructure\Persistence\Eloquent\Models\Casts\MoneyCast;
 use Database\Factories\OfferFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,8 +29,8 @@ class Offer extends Model
     ];
 
     protected $casts = [
-        'check_in' => 'date',
-        'check_out' => 'date',
+        'check_in' => DateOnlyCast::class,
+        'check_out' => DateOnlyCast::class,
         'expires_at' => 'datetime',
         'price' => MoneyCast::class,
     ];

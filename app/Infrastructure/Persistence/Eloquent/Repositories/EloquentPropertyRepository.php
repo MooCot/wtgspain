@@ -51,8 +51,8 @@ class EloquentPropertyRepository implements PropertyRepository
                 'suppliers.code as supplier_code',
             ])
             ->selectRaw('ROW_NUMBER() OVER (PARTITION BY offers.property_id ORDER BY offers.price ASC) as rn')
-            ->whereDate('offers.check_in', $criteria->get('check_in'))
-            ->whereDate('offers.check_out', $criteria->get('check_out'))
+            ->where('offers.check_in', $criteria->get('check_in'))
+            ->where('offers.check_out', $criteria->get('check_out'))
             ->where('offers.max_guests', '>=', $criteria->get('guests'))
             ->where('offers.available_units', '>', 0)
             ->where('offers.expires_at', '>', now())
