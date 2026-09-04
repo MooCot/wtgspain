@@ -18,6 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // /api/* — завжди JSON, незалежно від Accept-заголовка клієнта (інакше
+        // Laravel за замовчуванням редиректить на / при ValidationException і
+        // рендерить HTML-сторінку на 404 для не-JSON запитів).
+        $exceptions->shouldRenderJsonWhen(function (Request $request): bool {
+            return $request->is('api/*');
+        });
+
         $exceptions->render(function (OfferUnavailableException $e, Request $request): JsonResponse {
             return response()->json(['message' => $e->getMessage()], 409);
         });

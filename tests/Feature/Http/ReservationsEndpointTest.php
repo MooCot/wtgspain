@@ -56,4 +56,25 @@ class ReservationsEndpointTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    public function testItReturnsJsonValidationErrorsEvenWithoutAcceptHeader(): void
+    {
+        $offer = Offer::factory()->create(['available_units' => 2]);
+
+        // Без postJson()/Accept:application/json — саме так поводиться Swagger UI
+        // на деяких клієнтах; API під /api/* мусить завжди віддавати JSON, а не
+        // редиректити на / (дефолтна Laravel-поведінка для "не-JSON" запитів).
+        $response = $this->post("/api/offers/{$offer->id}/reservations", []);
+
+        $response->assertStatus(422);
+        $response->assertHeader('Content-Type', 'application/json');
+    }
+
+    public function testItReturnsJson404EvenWithoutAcceptHeader(): void
+    {
+        $response = $this->post('/api/offers/999999/reservations', $this->reservationPayload());
+
+        $response->assertStatus(404);
+        $response->assertHeader('Content-Type', 'application/json');
+    }
 }
