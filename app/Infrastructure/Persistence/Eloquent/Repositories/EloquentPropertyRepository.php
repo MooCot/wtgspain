@@ -7,6 +7,7 @@ use App\Application\Properties\PropertySearchResult;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class EloquentPropertyRepository implements PropertyRepository
@@ -76,7 +77,7 @@ class EloquentPropertyRepository implements PropertyRepository
                 price: $row->price,
                 currency: $row->currency,
                 availableUnits: $row->available_units,
-                expiresAt: $row->expires_at,
+                expiresAt: Carbon::parse($row->expires_at),
             ));
     }
 }

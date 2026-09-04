@@ -2,6 +2,8 @@
 
 namespace App\Application\Properties;
 
+use Illuminate\Support\Carbon;
+
 /**
  * DTO — one row of a property search result. No behavior by design;
  * pairs with PropertyRepository::searchWithBestOffer().
@@ -17,6 +19,6 @@ final class PropertySearchResult
         public readonly int $price,
         public readonly string $currency,
         public readonly int $availableUnits,
-        public readonly string $expiresAt,
+        public readonly Carbon $expiresAt,
     ) {}
 }

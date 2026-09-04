@@ -27,7 +27,7 @@ class PropertiesEndpointTest extends TestCase
             'price' => 72500,
             'currency' => 'EUR',
             'available_units' => 2,
-            'expires_at' => now()->addDays(5),
+            'expires_at' => '2026-09-10 23:59:59',
         ]);
 
         $response = $this->getJson('/api/properties?'.http_build_query([
@@ -42,6 +42,7 @@ class PropertiesEndpointTest extends TestCase
         $response->assertJsonPath('data.0.city', 'Barcelona');
         $response->assertJsonPath('data.0.best_offer.supplier', 'supplier-a');
         $response->assertJsonPath('data.0.best_offer.price', 72500);
+        $response->assertJsonPath('data.0.best_offer.expires_at', '2026-09-10T23:59:59.000000Z');
         $response->assertJsonStructure([
             'data' => [['code', 'name', 'city', 'best_offer' => ['id', 'supplier', 'price', 'currency', 'available_units', 'expires_at']]],
             'next',
