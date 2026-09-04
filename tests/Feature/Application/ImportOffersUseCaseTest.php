@@ -65,7 +65,7 @@ class ImportOffersUseCaseTest extends TestCase
         $useCase = $this->app->make(ImportOffersUseCase::class);
         $useCase->handle($import, $supplier, $offers);
 
-        $this->assertDatabaseCount('properties', 1); // C3 — той самий code, одна Property
+        $this->assertDatabaseCount('properties', 1);
         $this->assertDatabaseCount('offers', 2);
     }
 
@@ -75,14 +75,71 @@ class ImportOffersUseCaseTest extends TestCase
         $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
 
         $offers = collect([
-            $this->offerPayload(['property' => null]), // зламаний payload
+            $this->offerPayload(['property' => null]),
         ]);
 
         $useCase = $this->app->make(ImportOffersUseCase::class);
         $result = $useCase->handle($import, $supplier, $offers);
 
         $this->assertSame(ImportStatus::Failed, $result->status);
-        $this->assertNotNull($result->error);
+        $this->assertSame('Offer payload missing property data.', $result->error);
         $this->assertNotNull($result->completed_at);
+    }
+
+    public function testItDoesNotSwallowProgrammerErrors(): void
+    {
+        $supplier = Supplier::factory()->create();
+        $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
+
+        $offers = collect([
+            $this->offerPayload(['external_id' => null]),
+        ]);
+
+        $useCase = $this->app->make(ImportOffersUseCase::class);
+
+        $this->expectException(\TypeError::class);
+
+        $useCase->handle($import, $supplier, $offers);
+    }
+
+    public function testItStatesScopeOfPartialFailureInErrorMessage(): void
+    {
+        $supplier = Supplier::factory()->create();
+        $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
+
+        $offers = collect([
+            $this->offerPayload(['external_id' => 'offer-a']),
+            $this->offerPayload(['external_id' => 'offer-b']),
+            $this->offerPayload(['property' => null]),
+        ]);
+
+        $useCase = $this->app->make(ImportOffersUseCase::class);
+        $result = $useCase->handle($import, $supplier, $offers);
+
+        $this->assertSame(ImportStatus::Failed, $result->status);
+        $this->assertSame(2, $result->processed_offers);
+        $this->assertSame(3, $result->total_offers);
+        $this->assertSame(
+            'Offer payload missing property data. (2 of 3 offers were already processed and remain in the system.)',
+            $result->error,
+        );
+        $this->assertDatabaseCount('offers', 2);
+    }
+
+    public function testItHidesRawDriverErrorsBehindGenericMessage(): void
+    {
+        $supplier = Supplier::factory()->create();
+        $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
+
+        $offers = collect([
+            $this->offerPayload(['property' => ['code' => 'BCN-0001', 'city' => 'Barcelona']]),
+        ]);
+
+        $useCase = $this->app->make(ImportOffersUseCase::class);
+        $result = $useCase->handle($import, $supplier, $offers);
+
+        $this->assertSame(ImportStatus::Failed, $result->status);
+        $this->assertSame('Internal error while processing offers.', $result->error);
+        $this->assertStringNotContainsString('SQL:', (string) $result->error);
     }
 }

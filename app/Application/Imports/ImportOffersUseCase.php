@@ -2,6 +2,7 @@
 
 namespace App\Application\Imports;
 
+use App\Application\Imports\Exceptions\InvalidOfferPayloadException;
 use App\Application\Imports\Ports\ImportRepository;
 use App\Application\Imports\Ports\OfferRepository;
 use App\Application\Imports\Ports\PropertyRepository;
@@ -28,7 +29,7 @@ class ImportOffersUseCase
         try {
             foreach ($offersPayload as $offerData) {
                 if (! is_array($offerData['property'] ?? null)) {
-                    throw new \InvalidArgumentException('Offer payload missing property data.');
+                    throw new InvalidOfferPayloadException('Offer payload missing property data.');
                 }
 
                 /** @var array<string, mixed> $propertyPayload */
@@ -55,14 +56,33 @@ class ImportOffersUseCase
                 'processed_offers' => $processed,
                 'completed_at' => now(),
             ]);
-        } catch (\Throwable $e) {
+        } catch (InvalidOfferPayloadException $e) {
             return $this->imports->update($import, [
                 'status' => ImportStatus::Failed,
                 'total_offers' => $offersPayload->count(),
                 'processed_offers' => $processed,
-                'error' => $e->getMessage(),
+                'error' => $this->formatError($e->getMessage(), $processed, $offersPayload->count()),
+                'completed_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            report($e);
+
+            return $this->imports->update($import, [
+                'status' => ImportStatus::Failed,
+                'total_offers' => $offersPayload->count(),
+                'processed_offers' => $processed,
+                'error' => $this->formatError('Internal error while processing offers.', $processed, $offersPayload->count()),
                 'completed_at' => now(),
             ]);
         }
+    }
+
+    private function formatError(string $message, int $processed, int $total): string
+    {
+        if ($processed === 0) {
+            return $message;
+        }
+
+        return "{$message} ({$processed} of {$total} offers were already processed and remain in the system.)";
     }
 }
