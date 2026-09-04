@@ -25,7 +25,7 @@ class SearchPropertiesUseCaseTest extends TestCase
             'expires_at' => now()->addDays(5),
         ]);
 
-        $useCase = app(SearchPropertiesUseCase::class);
+        $useCase = $this->app->make(SearchPropertiesUseCase::class);
         $result = $useCase->handle([
             'check_in' => '2026-10-10',
             'check_out' => '2026-10-15',

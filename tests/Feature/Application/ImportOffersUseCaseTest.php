@@ -40,7 +40,7 @@ class ImportOffersUseCaseTest extends TestCase
             $this->offerPayload(['external_id' => 'offer-a']),
         ]);
 
-        $useCase = app(ImportOffersUseCase::class);
+        $useCase = $this->app->make(ImportOffersUseCase::class);
         $result = $useCase->handle($import, $supplier, $offers);
 
         $this->assertSame('completed', $result->status);
@@ -61,7 +61,7 @@ class ImportOffersUseCaseTest extends TestCase
             $this->offerPayload(['external_id' => 'offer-b']),
         ]);
 
-        $useCase = app(ImportOffersUseCase::class);
+        $useCase = $this->app->make(ImportOffersUseCase::class);
         $useCase->handle($import, $supplier, $offers);
 
         $this->assertDatabaseCount('properties', 1); // C3 — той самий code, одна Property
@@ -77,7 +77,7 @@ class ImportOffersUseCaseTest extends TestCase
             $this->offerPayload(['property' => null]), // зламаний payload
         ]);
 
-        $useCase = app(ImportOffersUseCase::class);
+        $useCase = $this->app->make(ImportOffersUseCase::class);
         $result = $useCase->handle($import, $supplier, $offers);
 
         $this->assertSame('failed', $result->status);

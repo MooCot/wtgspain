@@ -25,7 +25,7 @@ class CreateReservationUseCaseTest extends TestCase
     {
         $offer = Offer::factory()->create(['available_units' => 2]);
 
-        $useCase = app(CreateReservationUseCase::class);
+        $useCase = $this->app->make(CreateReservationUseCase::class);
         $reservation = $useCase->handle($offer, $this->reservationAttributes());
 
         $this->assertDatabaseCount('reservations', 1);
@@ -39,7 +39,7 @@ class CreateReservationUseCaseTest extends TestCase
 
         $this->expectException(OfferUnavailableException::class);
 
-        $useCase = app(CreateReservationUseCase::class);
+        $useCase = $this->app->make(CreateReservationUseCase::class);
 
         try {
             $useCase->handle($offer, $this->reservationAttributes());
