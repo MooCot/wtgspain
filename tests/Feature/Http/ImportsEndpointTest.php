@@ -5,7 +5,9 @@ namespace Tests\Feature\Http;
 use App\Infrastructure\Persistence\Eloquent\Models\Import;
 use App\Infrastructure\Persistence\Eloquent\Models\ImportStatus;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
+use App\Infrastructure\Queue\Jobs\ProcessImportJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class ImportsEndpointTest extends TestCase
@@ -68,6 +70,17 @@ class ImportsEndpointTest extends TestCase
         $this->assertSame($first->json('data.id'), $second->json('data.id'));
         $this->assertDatabaseCount('imports', 1);
         $this->assertDatabaseCount('offers', 1);
+    }
+
+    public function testItDoesNotDispatchProcessImportJobOnDuplicateSubmission(): void
+    {
+        Queue::fake();
+        Supplier::factory()->create(['code' => 'supplier-a']);
+
+        $this->postJson('/api/imports', $this->importPayload());
+        $this->postJson('/api/imports', $this->importPayload());
+
+        Queue::assertPushed(ProcessImportJob::class, 1);
     }
 
     public function testItRejectsUnknownSupplier(): void
