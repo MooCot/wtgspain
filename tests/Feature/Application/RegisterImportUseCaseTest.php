@@ -11,7 +11,7 @@ class RegisterImportUseCaseTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_creates_new_import(): void
+    public function testItCreatesNewImport(): void
     {
         $supplier = Supplier::factory()->create(['code' => 'supplier-a']);
 
@@ -24,7 +24,7 @@ class RegisterImportUseCaseTest extends TestCase
         $this->assertTrue($import->wasRecentlyCreated);
     }
 
-    public function test_it_returns_existing_import_idempotently(): void
+    public function testItReturnsExistingImportIdempotently(): void
     {
         Supplier::factory()->create(['code' => 'supplier-a']);
         $useCase = app(RegisterImportUseCase::class);
@@ -37,7 +37,7 @@ class RegisterImportUseCaseTest extends TestCase
         $this->assertFalse($second->wasRecentlyCreated);
     }
 
-    public function test_it_throws_for_unknown_supplier(): void
+    public function testItThrowsForUnknownSupplier(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
