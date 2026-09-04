@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http;
 
 use App\Infrastructure\Persistence\Eloquent\Models\Import;
+use App\Infrastructure\Persistence\Eloquent\Models\ImportStatus;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -47,7 +48,7 @@ class ImportsEndpointTest extends TestCase
         $response->assertJsonPath('data.status', 'pending');
 
         $import = Import::query()->firstOrFail();
-        $this->assertSame('completed', $import->status);
+        $this->assertSame(ImportStatus::Completed, $import->status);
         $this->assertSame(1, $import->total_offers);
         $this->assertSame(1, $import->processed_offers);
         $this->assertDatabaseCount('properties', 1);

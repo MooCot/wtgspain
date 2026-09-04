@@ -3,6 +3,7 @@
 namespace Tests\Feature\Application;
 
 use App\Application\Imports\RegisterImportUseCase;
+use App\Infrastructure\Persistence\Eloquent\Models\ImportStatus;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,7 +21,7 @@ class RegisterImportUseCaseTest extends TestCase
 
         $this->assertDatabaseCount('imports', 1);
         $this->assertSame($supplier->id, $import->supplier_id);
-        $this->assertSame('pending', $import->status);
+        $this->assertSame(ImportStatus::Pending, $import->status);
         $this->assertTrue($import->wasRecentlyCreated);
     }
 

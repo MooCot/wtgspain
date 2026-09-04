@@ -4,6 +4,7 @@ namespace Tests\Feature\Application;
 
 use App\Application\Imports\ImportOffersUseCase;
 use App\Infrastructure\Persistence\Eloquent\Models\Import;
+use App\Infrastructure\Persistence\Eloquent\Models\ImportStatus;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -43,7 +44,7 @@ class ImportOffersUseCaseTest extends TestCase
         $useCase = $this->app->make(ImportOffersUseCase::class);
         $result = $useCase->handle($import, $supplier, $offers);
 
-        $this->assertSame('completed', $result->status);
+        $this->assertSame(ImportStatus::Completed, $result->status);
         $this->assertSame(1, $result->total_offers);
         $this->assertSame(1, $result->processed_offers);
         $this->assertNotNull($result->completed_at);
@@ -80,7 +81,7 @@ class ImportOffersUseCaseTest extends TestCase
         $useCase = $this->app->make(ImportOffersUseCase::class);
         $result = $useCase->handle($import, $supplier, $offers);
 
-        $this->assertSame('failed', $result->status);
+        $this->assertSame(ImportStatus::Failed, $result->status);
         $this->assertNotNull($result->error);
         $this->assertNotNull($result->completed_at);
     }

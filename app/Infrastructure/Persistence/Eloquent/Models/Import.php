@@ -26,6 +26,7 @@ class Import extends Model
     protected $casts = [
         'sent_at' => 'datetime',
         'completed_at' => 'datetime',
+        'status' => ImportStatus::class,
     ];
 
     /**
