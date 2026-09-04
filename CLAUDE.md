@@ -166,7 +166,7 @@ app/
       Ports/ReservationRepository.php
   Infrastructure/
     Persistence/Eloquent/Models/       — Supplier, Property, Offer, Import, Reservation, ImportStatus (enum), Money (value object)
-    Persistence/Eloquent/Models/Casts/ — MoneyCast тощо: невіддільна частина визначення моделі (як $casts), тому в шарі Models, не Infrastructure
+    Persistence/Eloquent/Models/Casts/ — MoneyCast, DateOnlyCast: невіддільна частина визначення моделі (як $casts), тому в шарі Models, не Infrastructure. DateOnlyCast — Laravel-нативний `date`-каст на ЗАПИС серіалізує повним `Y-m-d H:i:s` (спецформату для дат без часу немає), тому check_in/check_out мають власний каст, що гарантує `Y-m-d` без часу в обидва боки
     Persistence/Eloquent/Repositories/ — Eloquent*Repository implements *Port
     Http/Controllers|Requests|Resources/
     Queue/Jobs/ProcessImportJob.php    — тонкий адаптер, кличе ImportOffersUseCase
