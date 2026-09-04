@@ -15,7 +15,7 @@ class OfferRepositoryTest extends TestCase
 
     private function offerAttributes(array $overrides = []): array
     {
-        return array_merge([
+        return collect([
             'check_in' => '2026-10-10',
             'check_out' => '2026-10-15',
             'max_guests' => 4,
@@ -23,7 +23,7 @@ class OfferRepositoryTest extends TestCase
             'currency' => 'EUR',
             'available_units' => 2,
             'expires_at' => '2026-09-10 23:59:59',
-        ], $overrides);
+        ])->merge($overrides)->all();
     }
 
     public function test_it_creates_offer_when_not_exists(): void
