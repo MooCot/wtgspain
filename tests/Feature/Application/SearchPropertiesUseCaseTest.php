@@ -36,6 +36,6 @@ class SearchPropertiesUseCaseTest extends TestCase
         ]);
 
         $this->assertCount(1, $result->items());
-        $this->assertSame($property->code, $result->items()[0]->property_code);
+        $this->assertSame($property->code, $result->items()[0]->propertyCode);
     }
 }
