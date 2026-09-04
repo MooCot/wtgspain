@@ -10,7 +10,7 @@ interface ReservationRepository
 {
     /**
      * Atomically decrements available_units and creates a Reservation in a
-     * single transaction — protects against double-booking the last unit (C4).
+     * single transaction — protects against double-booking the last unit.
      *
      * @param  array<string, mixed>  $attributes
      *
