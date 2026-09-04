@@ -14,14 +14,16 @@ class EloquentOfferRepository implements OfferRepository
      */
     public function updateOrCreate(Supplier $supplier, Property $property, string $externalId, array $attributes): Offer
     {
+        $values = collect($attributes)
+            ->merge(['property_id' => $property->id])
+            ->all();
+
         return Offer::query()->updateOrCreate(
             [
                 'supplier_id' => $supplier->id,
                 'external_id' => $externalId,
             ],
-            array_merge($attributes, [
-                'property_id' => $property->id,
-            ])
+            $values
         );
     }
 

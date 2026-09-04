@@ -206,6 +206,7 @@ ruleset:
 - Factories + seeders
 - Feature-тести
 - Контролери тонкі — бізнес-логіка в Application/UseCase, без штучної надбудови понад описану 2-шарову межу
+- **Колекції Laravel, не масиви:** обробка/трансформація даних — через `collect()`/`Illuminate\Support\Collection` (`->map()`, `->filter()`, `->merge()` тощо), НЕ `array_map`/`array_filter`/`array_merge` та інші `array_*`-функції. Виняток — межа з Eloquent/фреймворком, де метод сигнатурно вимагає `array` (наприклад `updateOrCreate(array, array)`): будувати значення через Collection, конвертувати в масив (`->all()`) лише в точці виклику.
 
 ## Процес розробки — TDD, фіча-тести
 
