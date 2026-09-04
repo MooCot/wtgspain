@@ -1,4 +1,7 @@
 grumphp:
+    # 60с-дефолт іноді замалий під навантаженням хоста (Larastan бутить весь Laravel-app).
+    process_timeout: 180.0
+
     # Хости не мають PHP — усі таски виконуються в контейнері app.
     git_hook_variables:
         EXEC_GRUMPHP_COMMAND: "docker compose exec -T app"
