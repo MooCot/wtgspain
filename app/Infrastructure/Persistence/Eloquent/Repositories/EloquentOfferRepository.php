@@ -7,6 +7,7 @@ use App\Infrastructure\Persistence\Eloquent\Models\Offer;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\Cache;
 
 class EloquentOfferRepository implements OfferRepository
 {
@@ -22,12 +23,16 @@ class EloquentOfferRepository implements OfferRepository
 
         if ($existing !== null) {
             $existing->update($values);
+            $this->invalidateSearchCache();
 
             return $existing->fresh();
         }
 
         try {
-            return Offer::query()->create(collect($lookup)->merge($values)->all());
+            $created = Offer::query()->create(collect($lookup)->merge($values)->all());
+            $this->invalidateSearchCache();
+
+            return $created;
         } catch (UniqueConstraintViolationException $e) {
             $recovered = Offer::query()->where($lookup)->first();
 
@@ -36,6 +41,7 @@ class EloquentOfferRepository implements OfferRepository
             }
 
             $recovered->update($values);
+            $this->invalidateSearchCache();
 
             return $recovered->fresh();
         }
@@ -48,6 +54,15 @@ class EloquentOfferRepository implements OfferRepository
             ->where('available_units', '>', 0)
             ->decrement('available_units');
 
+        if ($affected > 0) {
+            $this->invalidateSearchCache();
+        }
+
         return $affected > 0;
+    }
+
+    private function invalidateSearchCache(): void
+    {
+        Cache::tags([EloquentPropertyRepository::SEARCH_CACHE_TAG])->flush();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Infrastructure;
 
+use App\Application\Imports\Ports\OfferRepository;
 use App\Application\Imports\Ports\PropertyRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Offer;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
@@ -26,7 +27,7 @@ class PropertySearchCacheTest extends TestCase
         ])->merge($overrides)->all();
     }
 
-    public function testSearchResultsAreCachedForIdenticalCriteria(): void
+    public function testCacheIsNotInvalidatedByWritesBypassingTheRepository(): void
     {
         $repository = $this->app->make(PropertyRepository::class);
         $supplier = Supplier::factory()->create();
@@ -42,12 +43,38 @@ class PropertySearchCacheTest extends TestCase
         $first = $repository->searchWithBestOffer($this->searchCriteria());
         $this->assertCount(1, $first->items());
 
-        // Мутуємо дані напряму в БД, минаючи кеш — імітує зміну між запитами.
+        // Пряма мутація в обхід репозиторію — інвалідація тег-based її не бачить,
+        // це очікувана межа стратегії (не безмежний TTL-захист, а явна перевірка,
+        // що інвалідація прив'язана саме до наших repository-методів письма).
         DB::table('offers')->update(['available_units' => 0]);
 
         $second = $repository->searchWithBestOffer($this->searchCriteria());
 
         $this->assertCount(1, $second->items());
+    }
+
+    public function testCacheIsInvalidatedWhenOfferAvailabilityChangesViaRepository(): void
+    {
+        $propertyRepository = $this->app->make(PropertyRepository::class);
+        $offerRepository = $this->app->make(OfferRepository::class);
+        $supplier = Supplier::factory()->create();
+        $property = Property::factory()->create();
+        $offer = Offer::factory()->for($supplier)->for($property)->create([
+            'check_in' => '2026-10-10',
+            'check_out' => '2026-10-15',
+            'max_guests' => 4,
+            'available_units' => 1,
+            'expires_at' => now()->addDays(5),
+        ]);
+
+        $first = $propertyRepository->searchWithBestOffer($this->searchCriteria());
+        $this->assertCount(1, $first->items());
+
+        $offerRepository->decrementAvailableUnits($offer);
+
+        $second = $propertyRepository->searchWithBestOffer($this->searchCriteria());
+
+        $this->assertCount(0, $second->items());
     }
 
     public function testDifferentCriteriaAreNotCachedTogether(): void
