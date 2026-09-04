@@ -6,6 +6,11 @@ deptrac:
         - '#.*test.*#'
 
     layers:
+        - name: Models
+          collectors:
+              - type: classNameRegex
+                value: '#^App\\Infrastructure\\Persistence\\Eloquent\\Models\\.*#'
+
         - name: Application
           collectors:
               - type: classNameRegex
@@ -14,20 +19,29 @@ deptrac:
         - name: Infrastructure
           collectors:
               - type: classNameRegex
-                value: '#^App\\Infrastructure\\.*#'
+                value: '#^App\\Infrastructure\\(?!Persistence\\Eloquent\\Models\\).*#'
 
         - name: Providers
           collectors:
               - type: classNameRegex
                 value: '#^App\\Providers\\.*#'
 
-    # Application нічого не знає про Infrastructure — лише про власні Ports.
-    # Infrastructure реалізує Ports Application-шару, тому знає про нього.
-    # Providers — composition root, легітимний виняток: знає про обидва.
+    # Models — спільний "нижній" шар без окремого Domain (свідоме рішення, §CLAUDE.md
+    # "Архітектура"): Eloquent-моделі як типи-носії даних, не адаптери. Не залежить ні від
+    # чого з наших шарів. Application може типізувати Ports через Models — це НЕ витік у
+    # Infrastructure (адаптери/контролери/Job), лише спільний словник даних.
+    #
+    # Application нічого не знає про Infrastructure (адаптери) — лише про власні Ports + Models.
+    # Infrastructure реалізує Ports Application-шару, тому знає про нього (+ Models).
+    # Providers — composition root, легітимний виняток: знає про все.
     ruleset:
-        Application: []
+        Models: []
+        Application:
+            - Models
         Infrastructure:
             - Application
+            - Models
         Providers:
             - Application
             - Infrastructure
+            - Models
