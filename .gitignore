@@ -28,5 +28,8 @@ Thumbs.db
 .deptrac.cache
 /storage/framework/phpstan
 
+# згенерована OpenAPI-схема (php artisan l5-swagger:generate)
+/storage/api-docs
+
 # робочі аналітичні артефакти кандидата — не частина deliverable
 MODEL-wtgspain.md
