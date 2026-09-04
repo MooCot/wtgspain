@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Infrastructure;
 
-use App\Application\Imports\Ports\PropertyRepository;
+use App\Application\Properties\Ports\PropertyRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Offer;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;

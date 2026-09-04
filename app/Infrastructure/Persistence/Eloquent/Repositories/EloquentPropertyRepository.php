@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Persistence\Eloquent\Repositories;
 
-use App\Application\Imports\Ports\PropertyRepository;
+use App\Application\Properties\Ports\PropertyRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;

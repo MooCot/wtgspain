@@ -3,9 +3,9 @@
 namespace App\Providers;
 
 use App\Application\Imports\Ports\ImportRepository;
-use App\Application\Imports\Ports\OfferRepository;
-use App\Application\Imports\Ports\PropertyRepository;
 use App\Application\Imports\Ports\SupplierRepository;
+use App\Application\Offers\Ports\OfferRepository;
+use App\Application\Properties\Ports\PropertyRepository;
 use App\Application\Reservations\Ports\ReservationRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentImportRepository;
 use App\Infrastructure\Persistence\Eloquent\Repositories\EloquentOfferRepository;
