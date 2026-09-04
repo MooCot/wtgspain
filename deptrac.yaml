@@ -1,0 +1,33 @@
+deptrac:
+    paths:
+        - ./app
+
+    exclude_files:
+        - '#.*test.*#'
+
+    layers:
+        - name: Application
+          collectors:
+              - type: classNameRegex
+                value: '#^App\\Application\\.*#'
+
+        - name: Infrastructure
+          collectors:
+              - type: classNameRegex
+                value: '#^App\\Infrastructure\\.*#'
+
+        - name: Providers
+          collectors:
+              - type: classNameRegex
+                value: '#^App\\Providers\\.*#'
+
+    # Application нічого не знає про Infrastructure — лише про власні Ports.
+    # Infrastructure реалізує Ports Application-шару, тому знає про нього.
+    # Providers — composition root, легітимний виняток: знає про обидва.
+    ruleset:
+        Application: []
+        Infrastructure:
+            - Application
+        Providers:
+            - Application
+            - Infrastructure
