@@ -13,7 +13,7 @@ PHP 8.3 · Laravel 12 · MySQL 8.0 · Redis 7 (черга + кеш) · Nginx 1.2
 Redis (`CACHE_STORE=redis`, окрема БД-індекс від черги — `REDIS_CACHE_DB=1`):
 
 - **Supplier lookup** (`EloquentSupplierRepository::findByCode`) — TTL 1 година. Статичні дані (2 seed-постачальники, практично не міняються), читається на кожен `POST /api/imports`.
-- **Пошук `GET /api/properties`** (`EloquentPropertyRepository::searchWithBestOffer`) — TTL 30 секунд, ключ включає всі критерії пошуку. Свідомий компроміс: `available_units`/ціни міняються імпортами й бронюваннями, тому короткий TTL, а не активна інвалідація при кожному записі (яка б зв'язала Offer/Reservation-репозиторії з Property-кешем).
+- **Пошук `GET /api/properties`** (`EloquentPropertyRepository::searchWithBestOffer`) — Redis cache tags (`SEARCH_CACHE_TAG`), ключ включає всі критерії пошуку, TTL 5 хв — лише страхувальна сітка. Активна інвалідація: `EloquentOfferRepository` фляшить тег на кожен запис у `available_units`/ціну (`updateOrCreate`, `decrementAvailableUnits`), без прямого зв'язку між репозиторіями — Offer знає лише назву тега, не викликає Property-репозиторій. Первісний варіант (голий TTL 30с без інвалідації) був недостатній саме для цього домену: "остання одиниця" — критичний сценарій (заради нього й будувався атомарний `C4`-декремент), і 30с застарілої "доступності" в кеші систематично призводили б до фантомних 409 на бронюванні. Інвалідація не бачить запис в обхід репозиторію (пряме `DB::table()->update()`) — це свідома межа стратегії, покрита тестом.
 
 ## Встановлення і запуск
 

@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\DB;
 class EloquentPropertyRepository implements PropertyRepository
 {
     /**
+     * Спільний, наперед відомий тег — не пряме посилання на цей клас з інших
+     * репозиторіїв. OfferRepository лише фляшить тег за назвою, не викликає
+     * PropertyRepository напряму.
+     */
+    public const SEARCH_CACHE_TAG = 'properties:search';
+
+    /**
      * @param  array<string, mixed>  $attributes
      */
     public function findOrCreateByCode(string $code, array $attributes): Property
@@ -38,10 +45,10 @@ class EloquentPropertyRepository implements PropertyRepository
         $criteria = collect($criteria);
         $cacheKey = 'properties:search:'.md5(json_encode($criteria->sortKeys()->all()));
 
-        // TTL-обмежена свіжість, не активна інвалідація: available_units/ціни
-        // міняються імпортами й бронюваннями, тому короткий TTL (30с) — свідомий
-        // компроміс між навантаженням на БД і актуальністю, а не недогляд.
-        return Cache::remember($cacheKey, now()->addSeconds(30), function () use ($criteria) {
+        // Активна інвалідація тегом (не голий TTL): OfferRepository фляшить
+        // SEARCH_CACHE_TAG на кожен запис у available_units/price. TTL нижче —
+        // лише страхувальна сітка на випадок запису в обхід репозиторію.
+        return Cache::tags([self::SEARCH_CACHE_TAG])->remember($cacheKey, now()->addMinutes(5), function () use ($criteria) {
             $ranked = DB::table('offers')
                 ->join('properties', 'properties.id', '=', 'offers.property_id')
                 ->join('suppliers', 'suppliers.id', '=', 'offers.supplier_id')
