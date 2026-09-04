@@ -5,6 +5,7 @@ namespace App\Application\Imports;
 use App\Application\Imports\Ports\ImportRepository;
 use App\Application\Imports\Ports\SupplierRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Import;
+use App\Infrastructure\Persistence\Eloquent\Models\ImportStatus;
 
 class RegisterImportUseCase
 {
@@ -36,7 +37,7 @@ class RegisterImportUseCase
             'supplier_id' => $supplier->id,
             'external_import_id' => $externalImportId,
             'sent_at' => $sentAt,
-            'status' => 'pending',
+            'status' => ImportStatus::Pending,
         ]);
     }
 }

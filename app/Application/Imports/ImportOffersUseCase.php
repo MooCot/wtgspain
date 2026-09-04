@@ -6,6 +6,7 @@ use App\Application\Imports\Ports\ImportRepository;
 use App\Application\Imports\Ports\OfferRepository;
 use App\Application\Imports\Ports\PropertyRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Import;
+use App\Infrastructure\Persistence\Eloquent\Models\ImportStatus;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
 use Illuminate\Support\Collection;
 
@@ -49,14 +50,14 @@ class ImportOffersUseCase
             }
 
             return $this->imports->update($import, [
-                'status' => 'completed',
+                'status' => ImportStatus::Completed,
                 'total_offers' => $offersPayload->count(),
                 'processed_offers' => $processed,
                 'completed_at' => now(),
             ]);
         } catch (\Throwable $e) {
             return $this->imports->update($import, [
-                'status' => 'failed',
+                'status' => ImportStatus::Failed,
                 'total_offers' => $offersPayload->count(),
                 'processed_offers' => $processed,
                 'error' => $e->getMessage(),
