@@ -78,7 +78,7 @@ class PropertySearchRepositoryTest extends TestCase
         $result = $repository->searchWithBestOffer($this->searchCriteria());
 
         $this->assertCount(1, $result->items());
-        $this->assertSame($matching->code, $result->items()[0]->property_code);
+        $this->assertSame($matching->code, $result->items()[0]->propertyCode);
     }
 
     public function testItReturnsCheapestOfferPerProperty(): void
@@ -103,7 +103,7 @@ class PropertySearchRepositoryTest extends TestCase
 
         $this->assertCount(1, $result->items());
         $this->assertSame(50000, $result->items()[0]->price);
-        $this->assertSame($supplierB->code, $result->items()[0]->supplier_code);
+        $this->assertSame($supplierB->code, $result->items()[0]->supplierCode);
     }
 
     public function testItFiltersByCityWhenProvided(): void
@@ -128,6 +128,6 @@ class PropertySearchRepositoryTest extends TestCase
         $result = $repository->searchWithBestOffer($this->searchCriteria(['city' => 'Barcelona']));
 
         $this->assertCount(1, $result->items());
-        $this->assertSame('Barcelona', $result->items()[0]->property_city);
+        $this->assertSame('Barcelona', $result->items()[0]->propertyCity);
     }
 }

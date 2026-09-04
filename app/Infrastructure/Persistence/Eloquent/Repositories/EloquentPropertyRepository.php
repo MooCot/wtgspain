@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Persistence\Eloquent\Repositories;
 
 use App\Application\Properties\Ports\PropertyRepository;
+use App\Application\Properties\PropertySearchResult;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -33,7 +34,7 @@ class EloquentPropertyRepository implements PropertyRepository
 
     /**
      * @param  array<string, mixed>  $criteria
-     * @return LengthAwarePaginator<int, \stdClass>
+     * @return LengthAwarePaginator<int, PropertySearchResult>
      */
     public function searchWithBestOffer(array $criteria): LengthAwarePaginator
     {
@@ -70,7 +71,18 @@ class EloquentPropertyRepository implements PropertyRepository
                 ->paginate(
                     perPage: $criteria->get('per_page', 15),
                     page: $criteria->get('page', 1),
-                );
+                )
+                ->through(fn (\stdClass $row) => new PropertySearchResult(
+                    offerId: $row->offer_id,
+                    propertyCode: $row->property_code,
+                    propertyName: $row->property_name,
+                    propertyCity: $row->property_city,
+                    supplierCode: $row->supplier_code,
+                    price: $row->price,
+                    currency: $row->currency,
+                    availableUnits: $row->available_units,
+                    expiresAt: $row->expires_at,
+                ));
         });
     }
 }

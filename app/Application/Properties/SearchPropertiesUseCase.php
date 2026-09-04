@@ -13,7 +13,7 @@ class SearchPropertiesUseCase
 
     /**
      * @param  array<string, mixed>  $criteria
-     * @return LengthAwarePaginator<int, \stdClass>
+     * @return LengthAwarePaginator<int, PropertySearchResult>
      */
     public function handle(array $criteria): LengthAwarePaginator
     {
