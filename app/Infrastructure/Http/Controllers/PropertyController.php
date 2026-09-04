@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Http\Controllers;
 
-use App\Application\Properties\SearchPropertiesUseCase;
+use App\Application\Properties\Ports\PropertyRepository;
 use App\Infrastructure\Http\Requests\SearchPropertiesRequest;
 use App\Infrastructure\Http\Resources\PropertyResource;
 use Illuminate\Http\JsonResponse;
@@ -61,9 +61,9 @@ class PropertyController
             new OA\Response(response: 422, description: 'Validation error (missing check_in/check_out/guests)'),
         ],
     )]
-    public function index(SearchPropertiesRequest $request, SearchPropertiesUseCase $search): JsonResponse
+    public function index(SearchPropertiesRequest $request, PropertyRepository $properties): JsonResponse
     {
-        $paginator = $search->handle($request->searchCriteria());
+        $paginator = $properties->searchWithBestOffer($request->searchCriteria());
 
         return response()->json([
             'data' => PropertyResource::collection($paginator->items()),
