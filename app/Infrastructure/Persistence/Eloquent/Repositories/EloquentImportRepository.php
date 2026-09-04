@@ -5,6 +5,7 @@ namespace App\Infrastructure\Persistence\Eloquent\Repositories;
 use App\Application\Imports\Ports\ImportRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Import;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 class EloquentImportRepository implements ImportRepository
 {
@@ -21,7 +22,20 @@ class EloquentImportRepository implements ImportRepository
      */
     public function create(array $attributes): Import
     {
-        return Import::query()->create($attributes);
+        try {
+            return Import::query()->create($attributes);
+        } catch (UniqueConstraintViolationException $e) {
+            // Гонка: інший конкурентний запит з тим самим (supplier,
+            // external_import_id) закомітив INSERT між перевіркою в
+            // RegisterImportUseCase і нашим власним INSERT — C1 (ідемпотентність)
+            // мусить триматись і в цьому вузькому вікні, не лише послідовно.
+            $existing = $this->findBySupplierAndExternalImportId(
+                Supplier::query()->findOrFail($attributes['supplier_id']),
+                $attributes['external_import_id'],
+            );
+
+            return $existing ?? throw $e;
+        }
     }
 
     /**
