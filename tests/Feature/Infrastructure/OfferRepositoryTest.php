@@ -26,7 +26,7 @@ class OfferRepositoryTest extends TestCase
         ])->merge($overrides)->all();
     }
 
-    public function test_it_creates_offer_when_not_exists(): void
+    public function testItCreatesOfferWhenNotExists(): void
     {
         $repository = app(OfferRepository::class);
         $supplier = Supplier::factory()->create();
@@ -40,7 +40,7 @@ class OfferRepositoryTest extends TestCase
         $this->assertSame(2, $offer->available_units);
     }
 
-    public function test_it_updates_existing_offer_instead_of_duplicating(): void
+    public function testItUpdatesExistingOfferInsteadOfDuplicating(): void
     {
         $repository = app(OfferRepository::class);
         $supplier = Supplier::factory()->create();
@@ -58,7 +58,7 @@ class OfferRepositoryTest extends TestCase
         $this->assertSame(5, $updated->available_units);
     }
 
-    public function test_it_atomically_decrements_available_units(): void
+    public function testItAtomicallyDecrementsAvailableUnits(): void
     {
         $repository = app(OfferRepository::class);
         $offer = Offer::factory()->create(['available_units' => 1]);
@@ -69,7 +69,7 @@ class OfferRepositoryTest extends TestCase
         $this->assertSame(0, $offer->fresh()->available_units);
     }
 
-    public function test_it_refuses_to_decrement_below_zero(): void
+    public function testItRefusesToDecrementBelowZero(): void
     {
         $repository = app(OfferRepository::class);
         $offer = Offer::factory()->create(['available_units' => 0]);

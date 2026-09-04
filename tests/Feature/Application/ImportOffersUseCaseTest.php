@@ -31,7 +31,7 @@ class ImportOffersUseCaseTest extends TestCase
         ])->merge($overrides)->all();
     }
 
-    public function test_it_processes_offers_and_marks_import_completed(): void
+    public function testItProcessesOffersAndMarksImportCompleted(): void
     {
         $supplier = Supplier::factory()->create();
         $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
@@ -51,7 +51,7 @@ class ImportOffersUseCaseTest extends TestCase
         $this->assertDatabaseCount('properties', 1);
     }
 
-    public function test_it_reuses_existing_property_by_code(): void
+    public function testItReusesExistingPropertyByCode(): void
     {
         $supplier = Supplier::factory()->create();
         $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
@@ -68,7 +68,7 @@ class ImportOffersUseCaseTest extends TestCase
         $this->assertDatabaseCount('offers', 2);
     }
 
-    public function test_it_marks_import_failed_on_error(): void
+    public function testItMarksImportFailedOnError(): void
     {
         $supplier = Supplier::factory()->create();
         $import = Import::factory()->for($supplier)->create(['status' => 'pending']);
