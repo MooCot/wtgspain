@@ -9,12 +9,12 @@ use App\Infrastructure\Persistence\Eloquent\Models\Reservation;
 interface ReservationRepository
 {
     /**
-     * Атомарно декрементує available_units і створює Reservation в одній
-     * транзакції — захист від double-booking останньої одиниці (C4).
+     * Atomically decrements available_units and creates a Reservation in a
+     * single transaction — protects against double-booking the last unit (C4).
      *
      * @param  array<string, mixed>  $attributes
      *
-     * @throws OfferUnavailableException якщо available_units вже 0
+     * @throws OfferUnavailableException if available_units is already 0
      */
     public function createForOffer(Offer $offer, array $attributes): Reservation;
 }

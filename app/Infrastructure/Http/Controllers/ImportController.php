@@ -80,9 +80,6 @@ class ImportController
 
         $import = $register->handle($validated['supplier'], $validated['external_import_id'], $validated['sent_at']);
 
-        // Резолвимо відповідь ДО dispatch: sync-черга виконує Job одразу й мутує
-        // той самий $import in-place — інакше 202-відповідь показувала б вже
-        // completed замість pending.
         $response = (new ImportCreatedResource($import))->response()->setStatusCode(202);
 
         if ($import->wasRecentlyCreated) {

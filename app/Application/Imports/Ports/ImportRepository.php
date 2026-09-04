@@ -8,7 +8,7 @@ use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
 interface ImportRepository
 {
     /**
-     * C1 — унікальна пара (supplier, external_import_id).
+     * C1 — unique pair (supplier, external_import_id).
      */
     public function findBySupplierAndExternalImportId(Supplier $supplier, string $externalImportId): ?Import;
 
