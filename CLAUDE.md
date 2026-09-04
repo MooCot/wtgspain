@@ -165,7 +165,8 @@ app/
       CreateReservationUseCase.php
       Ports/ReservationRepository.php
   Infrastructure/
-    Persistence/Eloquent/Models/       — Supplier, Property, Offer, Import, Reservation
+    Persistence/Eloquent/Models/       — Supplier, Property, Offer, Import, Reservation, ImportStatus (enum), Money (value object)
+    Persistence/Eloquent/Models/Casts/ — MoneyCast тощо: невіддільна частина визначення моделі (як $casts), тому в шарі Models, не Infrastructure
     Persistence/Eloquent/Repositories/ — Eloquent*Repository implements *Port
     Http/Controllers|Requests|Resources/
     Queue/Jobs/ProcessImportJob.php    — тонкий адаптер, кличе ImportOffersUseCase

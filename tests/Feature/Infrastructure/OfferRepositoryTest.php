@@ -3,6 +3,7 @@
 namespace Tests\Feature\Infrastructure;
 
 use App\Application\Imports\Ports\OfferRepository;
+use App\Infrastructure\Persistence\Eloquent\Models\Money;
 use App\Infrastructure\Persistence\Eloquent\Models\Offer;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
 use App\Infrastructure\Persistence\Eloquent\Models\Supplier;
@@ -54,7 +55,7 @@ class OfferRepositoryTest extends TestCase
         ]));
 
         $this->assertDatabaseCount('offers', 1);
-        $this->assertSame(65000, $updated->price);
+        $this->assertEquals(new Money(65000, 'EUR'), $updated->price);
         $this->assertSame(5, $updated->available_units);
     }
 

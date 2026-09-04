@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Persistence\Eloquent\Models;
 
+use App\Infrastructure\Persistence\Eloquent\Models\Casts\MoneyCast;
 use Database\Factories\OfferFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,6 +31,7 @@ class Offer extends Model
         'check_in' => 'date',
         'check_out' => 'date',
         'expires_at' => 'datetime',
+        'price' => MoneyCast::class,
     ];
 
     /**
