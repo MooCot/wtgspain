@@ -4,19 +4,6 @@ REST API на Laravel 12: асинхронний імпорт пропозиці
 
 **Git-репозиторій:** https://github.com/MooCot/wtgspain
 
-## Стек
-
-PHP 8.3 · Laravel 12 · MySQL 8.0 · Redis 7 (черга + кеш) · Nginx 1.27 — усе через Docker Compose.
-
-## Кешування
-
-Redis (`CACHE_STORE=redis`, окрема БД-індекс від черги — `REDIS_CACHE_DB=1`):
-
-- **Supplier lookup** (`EloquentSupplierRepository::findByCode`) — TTL 1 година. Статичні дані (2 seed-постачальники, практично не міняються), читається на кожен `POST /api/imports`.
-- **Пошук `GET /api/properties`** (`EloquentPropertyRepository::searchWithBestOffer`) — Redis cache tags (`SEARCH_CACHE_TAG`), ключ включає всі критерії пошуку, TTL 5 хв — лише страхувальна сітка. Активна інвалідація: `EloquentOfferRepository` фляшить тег на кожен запис у `available_units`/ціну (`updateOrCreate`, `decrementAvailableUnits`), без прямого зв'язку між репозиторіями — Offer знає лише назву тега, не викликає Property-репозиторій. Інвалідація не бачить запис в обхід репозиторію (пряме `DB::table()->update()`) — це свідома межа стратегії, покрита тестом.
-
-**Відомий залишковий ризик (прийнятий, не виправлений):** вузьке вікно гонки між SELECT і PUT усередині `remember()` — якщо конкурентний `flush()` прилітає саме в цей проміжок, застарілий результат все одно потрапляє в кеш (перевірено емпірично на живому Redis). Ключовий нюанс: висить він не до TTL (5 хв) — Laravel Redis-теги працюють через ZSET-реєстрацію ключів (`RedisTagSet`), тож застарілий запис гарантовано зникає на наступному будь-якому записі в тег (секунди-хвилини в активній системі), TTL — лише worst-case межа для тиші після гонки. Впливає лише на UI-видачу `GET /api/properties` (список пропозицій може на секунди показати вже неактуальну ціну/доступність) — на цілісність даних не впливає: саме бронювання йде повз кеш і захищене атомарним декрементом `available_units`, тож застаріла картинка в пошуку ніколи не дозволить забронювати те, чого вже немає.
-
 ## Встановлення і запуск
 
 ```bash
@@ -49,6 +36,19 @@ docker compose exec -u www-data app php artisan db:seed
 | Queue worker | піднімається автоматично як сервіс `queue`; вручну — `docker compose exec -u www-data app php artisan queue:work` |
 | Тести | `docker compose exec -u www-data app php artisan test` |
 | Статичний аналіз + межі архітектури + стиль | `docker compose exec -u www-data app vendor/bin/grumphp run` (запускається й автоматично на `git commit`/`git push` через git-хуки) |
+
+## Стек
+
+PHP 8.3 · Laravel 12 · MySQL 8.0 · Redis 7 (черга + кеш) · Nginx 1.27 — усе через Docker Compose.
+
+## Кешування
+
+Redis (`CACHE_STORE=redis`, окрема БД-індекс від черги — `REDIS_CACHE_DB=1`):
+
+- **Supplier lookup** (`EloquentSupplierRepository::findByCode`) — TTL 1 година. Статичні дані (2 seed-постачальники, практично не міняються), читається на кожен `POST /api/imports`.
+- **Пошук `GET /api/properties`** (`EloquentPropertyRepository::searchWithBestOffer`) — Redis cache tags (`SEARCH_CACHE_TAG`), ключ включає всі критерії пошуку, TTL 5 хв — лише страхувальна сітка. Активна інвалідація: `EloquentOfferRepository` фляшить тег на кожен запис у `available_units`/ціну (`updateOrCreate`, `decrementAvailableUnits`), без прямого зв'язку між репозиторіями — Offer знає лише назву тега, не викликає Property-репозиторій. Інвалідація не бачить запис в обхід репозиторію (пряме `DB::table()->update()`) — це свідома межа стратегії, покрита тестом.
+
+**Відомий залишковий ризик (прийнятий, не виправлений):** вузьке вікно гонки між SELECT і PUT усередині `remember()` — якщо конкурентний `flush()` прилітає саме в цей проміжок, застарілий результат все одно потрапляє в кеш (перевірено емпірично на живому Redis). Ключовий нюанс: висить він не до TTL (5 хв) — Laravel Redis-теги працюють через ZSET-реєстрацію ключів (`RedisTagSet`), тож застарілий запис гарантовано зникає на наступному будь-якому записі в тег (секунди-хвилини в активній системі), TTL — лише worst-case межа для тиші після гонки. Впливає лише на UI-видачу `GET /api/properties` (список пропозицій може на секунди показати вже неактуальну ціну/доступність) — на цілісність даних не впливає: саме бронювання йде повз кеш і захищене атомарним декрементом `available_units`, тож застаріла картинка в пошуку ніколи не дозволить забронювати те, чого вже немає.
 
 ## Ідемпотентність імпорту
 
