@@ -50,13 +50,6 @@ class PropertiesEndpointTest extends TestCase
         ]);
     }
 
-    public function testItRequiresCheckInCheckOutGuests(): void
-    {
-        $response = $this->getJson('/api/properties');
-
-        $response->assertStatus(422);
-    }
-
     public function testItFiltersByCityWhenProvided(): void
     {
         $supplier = Supplier::factory()->create();

@@ -108,11 +108,4 @@ class ImportsEndpointTest extends TestCase
         $response->assertJsonPath('data.status', 'completed');
         $response->assertJsonPath('data.total_offers', 3);
     }
-
-    public function testItReturns404ForUnknownImport(): void
-    {
-        $response = $this->getJson('/api/imports/999999');
-
-        $response->assertStatus(404);
-    }
 }

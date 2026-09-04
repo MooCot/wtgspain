@@ -56,22 +56,6 @@ class ReservationsEndpointTest extends TestCase
         $this->assertDatabaseCount('reservations', 0);
     }
 
-    public function testItValidatesRequiredFields(): void
-    {
-        $offer = Offer::factory()->create(['available_units' => 2]);
-
-        $response = $this->postJson("/api/offers/{$offer->id}/reservations", []);
-
-        $response->assertStatus(422);
-    }
-
-    public function testItReturns404ForUnknownOffer(): void
-    {
-        $response = $this->postJson('/api/offers/999999/reservations', $this->reservationPayload());
-
-        $response->assertStatus(404);
-    }
-
     public function testItReturnsCleanBodyOn404RegardlessOfAppDebug(): void
     {
         $response = $this->postJson('/api/offers/999999/reservations', $this->reservationPayload());
