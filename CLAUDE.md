@@ -208,6 +208,7 @@ ruleset:
 - Контролери тонкі — бізнес-логіка в Application/UseCase, без штучної надбудови понад описану 2-шарову межу
 - **Колекції Laravel, не масиви:** обробка/трансформація даних — через `collect()`/`Illuminate\Support\Collection` (`->map()`, `->filter()`, `->merge()` тощо), НЕ `array_map`/`array_filter`/`array_merge` та інші `array_*`-функції. Виняток — межа з Eloquent/фреймворком, де метод сигнатурно вимагає `array` (наприклад `updateOrCreate(array, array)`): будувати значення через Collection, конвертувати в масив (`->all()`) лише в точці виклику.
 - **camelCase, не snake_case — всюди, включно з тестовими методами.** `public function testItCreatesNewImport()`, НЕ `test_it_creates_new_import()`. Laravel-преcет Pint за замовчуванням вимагає snake_case для тестів (`php_unit_method_casing`) — перевизначено в `pint.json` (`"case": "camel_case"`), інакше гейт постійно конфліктував би з цим правилом.
+- **Ніякого `app()` helper — ні в проді, ні в тестах.** У Controllers/Jobs — constructor injection (Laravel сам резолвить залежності). У тестах — `$this->app->make(X::class)` замість глобального `app(X::class)`.
 
 ## Процес розробки — TDD, фіча-тести
 

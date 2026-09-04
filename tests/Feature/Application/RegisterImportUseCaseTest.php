@@ -15,7 +15,7 @@ class RegisterImportUseCaseTest extends TestCase
     {
         $supplier = Supplier::factory()->create(['code' => 'supplier-a']);
 
-        $useCase = app(RegisterImportUseCase::class);
+        $useCase = $this->app->make(RegisterImportUseCase::class);
         $import = $useCase->handle('supplier-a', 'import-2026-09-01-001', '2026-09-01T10:00:00Z');
 
         $this->assertDatabaseCount('imports', 1);
@@ -27,7 +27,7 @@ class RegisterImportUseCaseTest extends TestCase
     public function testItReturnsExistingImportIdempotently(): void
     {
         Supplier::factory()->create(['code' => 'supplier-a']);
-        $useCase = app(RegisterImportUseCase::class);
+        $useCase = $this->app->make(RegisterImportUseCase::class);
 
         $first = $useCase->handle('supplier-a', 'import-2026-09-01-001', '2026-09-01T10:00:00Z');
         $second = $useCase->handle('supplier-a', 'import-2026-09-01-001', '2026-09-01T10:00:00Z');
@@ -41,7 +41,7 @@ class RegisterImportUseCaseTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $useCase = app(RegisterImportUseCase::class);
+        $useCase = $this->app->make(RegisterImportUseCase::class);
         $useCase->handle('unknown-supplier', 'import-1', '2026-09-01T10:00:00Z');
     }
 }

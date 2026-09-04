@@ -27,7 +27,7 @@ class PropertySearchRepositoryTest extends TestCase
 
     public function testItReturnsOnlyOffersMatchingCriteria(): void
     {
-        $repository = app(PropertyRepository::class);
+        $repository = $this->app->make(PropertyRepository::class);
         $supplier = Supplier::factory()->create();
 
         $matching = Property::factory()->create(['city' => 'Barcelona']);
@@ -83,7 +83,7 @@ class PropertySearchRepositoryTest extends TestCase
 
     public function testItReturnsCheapestOfferPerProperty(): void
     {
-        $repository = app(PropertyRepository::class);
+        $repository = $this->app->make(PropertyRepository::class);
         $supplierA = Supplier::factory()->create();
         $supplierB = Supplier::factory()->create();
         $property = Property::factory()->create();
@@ -108,7 +108,7 @@ class PropertySearchRepositoryTest extends TestCase
 
     public function testItFiltersByCityWhenProvided(): void
     {
-        $repository = app(PropertyRepository::class);
+        $repository = $this->app->make(PropertyRepository::class);
         $supplier = Supplier::factory()->create();
 
         $commonAttributes = [

@@ -28,7 +28,7 @@ class OfferRepositoryTest extends TestCase
 
     public function testItCreatesOfferWhenNotExists(): void
     {
-        $repository = app(OfferRepository::class);
+        $repository = $this->app->make(OfferRepository::class);
         $supplier = Supplier::factory()->create();
         $property = Property::factory()->create();
 
@@ -42,7 +42,7 @@ class OfferRepositoryTest extends TestCase
 
     public function testItUpdatesExistingOfferInsteadOfDuplicating(): void
     {
-        $repository = app(OfferRepository::class);
+        $repository = $this->app->make(OfferRepository::class);
         $supplier = Supplier::factory()->create();
         $property = Property::factory()->create();
 
@@ -60,7 +60,7 @@ class OfferRepositoryTest extends TestCase
 
     public function testItAtomicallyDecrementsAvailableUnits(): void
     {
-        $repository = app(OfferRepository::class);
+        $repository = $this->app->make(OfferRepository::class);
         $offer = Offer::factory()->create(['available_units' => 1]);
 
         $result = $repository->decrementAvailableUnits($offer);
@@ -71,7 +71,7 @@ class OfferRepositoryTest extends TestCase
 
     public function testItRefusesToDecrementBelowZero(): void
     {
-        $repository = app(OfferRepository::class);
+        $repository = $this->app->make(OfferRepository::class);
         $offer = Offer::factory()->create(['available_units' => 0]);
 
         $result = $repository->decrementAvailableUnits($offer);
