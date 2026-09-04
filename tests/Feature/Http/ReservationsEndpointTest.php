@@ -69,9 +69,6 @@ class ReservationsEndpointTest extends TestCase
     {
         $offer = Offer::factory()->create(['available_units' => 2]);
 
-        // Без postJson()/Accept:application/json — саме так поводиться Swagger UI
-        // на деяких клієнтах; API під /api/* мусить завжди віддавати JSON, а не
-        // редиректити на / (дефолтна Laravel-поведінка для "не-JSON" запитів).
         $response = $this->post("/api/offers/{$offer->id}/reservations", []);
 
         $response->assertStatus(422);

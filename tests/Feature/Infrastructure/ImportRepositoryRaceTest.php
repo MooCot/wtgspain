@@ -17,10 +17,6 @@ class ImportRepositoryRaceTest extends TestCase
         $repository = $this->app->make(ImportRepository::class);
         $supplier = Supplier::factory()->create();
 
-        // Симулюємо гонку: рядок уже існує (ніби інший конкурентний запит щойно
-        // закомітив INSERT), а ми все одно викликаємо create() з тими самими
-        // (supplier, external_import_id) — так само, як RegisterImportUseCase
-        // зробив би, якби програв гонку між власною перевіркою і своїм INSERT.
         $existing = Import::factory()->for($supplier)->create([
             'external_import_id' => 'import-1',
         ]);
