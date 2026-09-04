@@ -37,6 +37,12 @@ docker compose exec -u www-data app php artisan db:seed
 | Тести | `docker compose exec -u www-data app php artisan test` |
 | Статичний аналіз + межі архітектури + стиль | `docker compose exec -u www-data app vendor/bin/grumphp run` (запускається й автоматично на `git commit`/`git push` через git-хуки) |
 
+GrumPHP тут — оркестратор, сам гейт складається з трьох незалежних інструментів:
+
+- **PHPStan + Larastan** (`phpstan.neon`, рівень 6) — статичний аналіз типів: неправильні типи аргументів/повернення, звернення до неіснуючих властивостей/методів, недосяжний код. Larastan додає розуміння Laravel-специфіки (фасади, `$model->property` через магію Eloquent, конфіг-масиви).
+- **Deptrac** (`deptrac.yaml`) — межі гексагональних шарів. Перевіряє, що `Models` ні від чого не залежить, `Application` — лише від `Models`, `Infrastructure` — від `Application`+`Models`, `Providers` — від усіх; будь-яка залежність у зворотному напрямку (наприклад, `Application`, що звертається до `Infrastructure`) валить гейт.
+- **Pint** (`pint.json`, Laravel preset) — форматування коду (PSR-12 + Laravel-конвенції); запускається як `--test` (лише перевірка, без автофіксу — щоб хук не змінював файли непомітно для розробника).
+
 ## Стек
 
 PHP 8.3 · Laravel 12 · MySQL 8.0 · Redis 7 (черга + кеш) · Nginx 1.27 — усе через Docker Compose.
