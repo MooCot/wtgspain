@@ -149,7 +149,7 @@ GET /api/properties?city=Barcelona&check_in=2026-10-10&check_out=2026-10-15&gues
 
 ## Архітектура — гексагональна, легка версія
 
-Два шари (без окремого Domain — рішення свідоме, щоб не суперечити вимозі ТЗ уникати зайвих абстракцій): **Application** (ports + use-case сервіси) та **Infrastructure** (адаптери). Плюс **Providers** — composition root, єдиний, кому дозволено бачити обидва шари.
+Два шари (без окремого Domain — рішення свідоме, щоб не суперечити вимозі ТЗ уникати зайвих абстракцій): **Application** (ports + use-case сервіси) та **Infrastructure** (адаптери). Плюс **Models** — Eloquent-моделі як спільний "нижній" шар типів-носіїв даних (не окремий Domain, але й не частина Infrastructure-адаптерів для цілей межі — інакше Application, типізуючи Ports через `Offer`, технічно залежав би від Infrastructure). Плюс **Providers** — composition root, єдиний, кому дозволено бачити все.
 
 ```
 app/
@@ -171,23 +171,26 @@ app/
     RepositoryServiceProvider.php      — composition root, біндить Port → Eloquent-реалізацію
 ```
 
-**Правило напрямку залежностей:** Application нічого не знає про Illuminate\Database\Eloquent чи Illuminate\Http — лише про власні Ports. Infrastructure знає про Application (реалізує його Ports, викликає його UseCase). Providers — єдиний виняток, знає про обидва (composition root, точка збірки шарів докупи).
+**Правило напрямку залежностей:** Application нічого не знає про Illuminate\Database\Eloquent чи Illuminate\Http, окрім Models (типи-носії даних) — лише власні Ports + Models. Infrastructure знає про Application (реалізує його Ports, викликає його UseCase) + Models. Providers — єдиний виняток, знає про все (composition root, точка збірки шарів докупи).
 
 **HTTP-контролер і Queue Job рівноправні** — обидва "driving adapters" в Infrastructure, обидва лише викликають UseCase з Application, ніколи навпаки.
 
-**Enforcement — Deptrac** (`depfile.yaml`, `qossmic/deptrac`), таск у GrumPHP:
+**Enforcement — Deptrac** (`deptrac.yaml`, `deptrac/deptrac` — не плутати з abandoned `qossmic/deptrac`), таск у GrumPHP:
 ```yaml
 layers:
+  - name: Models
+    collectors: [{type: classNameRegex, value: '#^App\\Infrastructure\\Persistence\\Eloquent\\Models\\.*#'}]
   - name: Application
-    collectors: [{type: className, regex: ^App\\Application\\.*}]
+    collectors: [{type: classNameRegex, value: '#^App\\Application\\.*#'}]
   - name: Infrastructure
-    collectors: [{type: className, regex: ^App\\Infrastructure\\.*}]
+    collectors: [{type: classNameRegex, value: '#^App\\Infrastructure\\(?!Persistence\\Eloquent\\Models\\).*#'}]
   - name: Providers
-    collectors: [{type: className, regex: ^App\\Providers\\.*}]
+    collectors: [{type: classNameRegex, value: '#^App\\Providers\\.*#'}]
 ruleset:
-  Application: []                          # не бачить Infrastructure — лише власні Ports
-  Infrastructure: [Application]            # адаптери реалізують Ports Application-шару
-  Providers: [Application, Infrastructure] # composition root — легітимний виняток
+  Models: []                                       # нічого не знає ні про кого
+  Application: [Models]                            # Ports типізовані через Models — не витік у Infrastructure
+  Infrastructure: [Application, Models]            # адаптери реалізують Ports, використовують Models
+  Providers: [Application, Infrastructure, Models] # composition root — легітимний виняток
 ```
 
 Кожне правило межі супроводжується коментарем-поясненням "чому" (не просто заборона, а причина).
