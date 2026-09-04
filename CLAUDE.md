@@ -43,6 +43,8 @@ composer require --dev phpstan/phpstan larastan/larastan phpro/grumphp
 
 **Seeder:** два постачальники — `supplier-a`, `supplier-b`.
 
+**Гроші (price):** payload постачальника (`"price": 72500`) вже в мінімальних одиницях валюти (копійки/центи — 72500 = 725.00 EUR, реалістична ціна за 5 ночей). Зберігається AS-IS, `unsignedInteger`, БЕЗ арифметичної конвертації на вході чи виході — жодного множення/ділення на 100 ніде в коді. `currency` — окреме поле, конвертація валют не в скоупі.
+
 ## Endpoints
 
 ### `POST /api/imports` — імпорт пропозицій
