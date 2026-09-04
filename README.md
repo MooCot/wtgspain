@@ -6,7 +6,14 @@ REST API на Laravel 12: асинхронний імпорт пропозиці
 
 ## Стек
 
-PHP 8.3 · Laravel 12 · MySQL 8.0 · Redis 7 (черга) · Nginx 1.27 — усе через Docker Compose.
+PHP 8.3 · Laravel 12 · MySQL 8.0 · Redis 7 (черга + кеш) · Nginx 1.27 — усе через Docker Compose.
+
+## Кешування
+
+Redis (`CACHE_STORE=redis`, окрема БД-індекс від черги — `REDIS_CACHE_DB=1`):
+
+- **Supplier lookup** (`EloquentSupplierRepository::findByCode`) — TTL 1 година. Статичні дані (2 seed-постачальники, практично не міняються), читається на кожен `POST /api/imports`.
+- **Пошук `GET /api/properties`** (`EloquentPropertyRepository::searchWithBestOffer`) — TTL 30 секунд, ключ включає всі критерії пошуку. Свідомий компроміс: `available_units`/ціни міняються імпортами й бронюваннями, тому короткий TTL, а не активна інвалідація при кожному записі (яка б зв'язала Offer/Reservation-репозиторії з Property-кешем).
 
 ## Встановлення і запуск
 
