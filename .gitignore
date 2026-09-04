@@ -24,5 +24,9 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
+# кеш інструментів якості коду
+.deptrac.cache
+/storage/framework/phpstan
+
 # робочі аналітичні артефакти кандидата — не частина deliverable
 MODEL-wtgspain.md
