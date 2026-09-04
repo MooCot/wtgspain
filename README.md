@@ -1,5 +1,7 @@
 # wtgspain
 
+[![CI](https://github.com/MooCot/wtgspain/actions/workflows/ci.yml/badge.svg)](https://github.com/MooCot/wtgspain/actions/workflows/ci.yml)
+
 REST API на Laravel 12: асинхронний імпорт пропозицій житла від постачальників, пошук найдешевшої актуальної пропозиції, безпечне бронювання.
 
 **Git-репозиторій:** https://github.com/MooCot/wtgspain
