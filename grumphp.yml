@@ -4,7 +4,7 @@ grumphp:
 
     # Хости не мають PHP — усі таски виконуються в контейнері app.
     git_hook_variables:
-        EXEC_GRUMPHP_COMMAND: "docker compose exec -T app"
+        EXEC_GRUMPHP_COMMAND: "docker compose exec -T -u www-data app"
 
     tasks:
         git_commit_message:

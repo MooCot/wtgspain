@@ -29,26 +29,26 @@ docker compose build
 docker compose run --rm app composer install
 docker compose up -d
 
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate --force
-docker compose exec app php artisan db:seed
+docker compose exec -u www-data app php artisan key:generate
+docker compose exec -u www-data app php artisan migrate --force
+docker compose exec -u www-data app php artisan db:seed
 ```
 
 Застосунок доступний на `http://localhost:8080`.
 
-**Swagger UI** (інтерактивне тестування API): `http://localhost:8080/api/documentation`. Схема автогенерується з PHP-атрибутів у контролерах (`darkaonline/l5-swagger`); `L5_SWAGGER_GENERATE_ALWAYS=true` у `.env` тримає її актуальною при кожному запиті в dev-режимі. Ручна регенерація: `docker compose exec app php artisan l5-swagger:generate`.
+**Swagger UI** (інтерактивне тестування API): `http://localhost:8080/api/documentation`. Схема автогенерується з PHP-атрибутів у контролерах (`darkaonline/l5-swagger`); `L5_SWAGGER_GENERATE_ALWAYS=true` у `.env` тримає її актуальною при кожному запиті в dev-режимі. Ручна регенерація: `docker compose exec -u www-data app php artisan l5-swagger:generate`.
 
-> Якщо `/docs` чи `/api/documentation` раптом віддає 404 — ймовірно, `storage/api-docs/` створився під `root` (наприклад після ручного `docker compose exec app ...` без `--user www-data`), а php-fpm-воркер пише як `www-data`. Фікс: `docker compose exec app chown -R www-data:www-data storage/api-docs` (або просто `docker compose restart app` — `docker-entrypoint.sh` перевстановлює права на весь `storage/` при старті).
+> `-u www-data` — обов'язковий для будь-якого `exec`, що торкається `storage/` (artisan, grumphp). Без нього команда виконується як `root` (дефолт контейнера, потрібен `docker-entrypoint.sh` для `chown` на bind-mount) і псує права для php-fpm-воркера, який завжди пише як `www-data` — типовий симптом: `/docs`/`/api/documentation` раптом віддає 404.
 
 ## Команди
 
 | Дія | Команда |
 |---|---|
-| Міграції | `docker compose exec app php artisan migrate` |
-| Seeders (supplier-a, supplier-b) | `docker compose exec app php artisan db:seed` |
-| Queue worker | піднімається автоматично як сервіс `queue`; вручну — `docker compose exec app php artisan queue:work` |
-| Тести | `docker compose exec app php artisan test` |
-| Статичний аналіз + межі архітектури + стиль | `docker compose exec app vendor/bin/grumphp run` (запускається й автоматично на `git commit`/`git push` через git-хуки) |
+| Міграції | `docker compose exec -u www-data app php artisan migrate` |
+| Seeders (supplier-a, supplier-b) | `docker compose exec -u www-data app php artisan db:seed` |
+| Queue worker | піднімається автоматично як сервіс `queue`; вручну — `docker compose exec -u www-data app php artisan queue:work` |
+| Тести | `docker compose exec -u www-data app php artisan test` |
+| Статичний аналіз + межі архітектури + стиль | `docker compose exec -u www-data app vendor/bin/grumphp run` (запускається й автоматично на `git commit`/`git push` через git-хуки) |
 
 ## Ідемпотентність імпорту
 
