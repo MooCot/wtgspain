@@ -25,10 +25,6 @@ class EloquentImportRepository implements ImportRepository
         try {
             return Import::query()->create($attributes);
         } catch (UniqueConstraintViolationException $e) {
-            // Гонка: інший конкурентний запит з тим самим (supplier,
-            // external_import_id) закомітив INSERT між перевіркою в
-            // RegisterImportUseCase і нашим власним INSERT — C1 (ідемпотентність)
-            // мусить триматись і в цьому вузькому вікні, не лише послідовно.
             $existing = $this->findBySupplierAndExternalImportId(
                 Supplier::query()->findOrFail($attributes['supplier_id']),
                 $attributes['external_import_id'],

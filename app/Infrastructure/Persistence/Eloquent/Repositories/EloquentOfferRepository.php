@@ -29,8 +29,6 @@ class EloquentOfferRepository implements OfferRepository
         try {
             return Offer::query()->create(collect($lookup)->merge($values)->all());
         } catch (UniqueConstraintViolationException $e) {
-            // Гонка: той самий (supplier, external_id) прийшов у двох
-            // паралельних імпортах — C2 мусить триматись і в цьому вікні.
             $recovered = Offer::query()->where($lookup)->first();
 
             if ($recovered === null) {

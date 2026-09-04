@@ -24,8 +24,6 @@ class EloquentPropertyRepository implements PropertyRepository
         try {
             return Property::query()->create(collect($attributes)->merge(['code' => $code])->all());
         } catch (UniqueConstraintViolationException $e) {
-            // Гонка: два офери з однаковим property.code обробляються паралельно
-            // (різні Job/воркери) — C3 мусить триматись і в цьому вікні.
             return Property::query()->where('code', $code)->first() ?? throw $e;
         }
     }

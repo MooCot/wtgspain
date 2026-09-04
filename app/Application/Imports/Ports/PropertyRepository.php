@@ -8,15 +8,15 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 interface PropertyRepository
 {
     /**
-     * Ідемпотентно знаходить або створює Property за code — C3.
+     * Idempotently finds or creates a Property by code — C3.
      *
      * @param  array<string, mixed>  $attributes
      */
     public function findOrCreateByCode(string $code, array $attributes): Property;
 
     /**
-     * Пошук найдешевшої актуальної пропозиції на кожну Property — P5 (предикат),
-     * вибір найдешевшої + сортування + пагінація на рівні SQL, не PHP-колекціями.
+     * Searches for the cheapest actual offer per Property — P5 (predicate),
+     * selection + sorting + pagination at the SQL level, not PHP collections.
      *
      * @param  array<string, mixed>  $criteria  check_in, check_out, guests, city, page, per_page
      * @return LengthAwarePaginator<int, \stdClass>
