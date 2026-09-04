@@ -31,6 +31,21 @@ class ReservationsEndpointTest extends TestCase
         $this->assertSame(1, $offer->fresh()->available_units);
     }
 
+    public function testItIsIdempotentOnDuplicateSubmission(): void
+    {
+        $offer = Offer::factory()->create(['available_units' => 1]);
+        $payload = $this->reservationPayload();
+
+        $first = $this->postJson("/api/offers/{$offer->id}/reservations", $payload);
+        $second = $this->postJson("/api/offers/{$offer->id}/reservations", $payload);
+
+        $first->assertStatus(201);
+        $second->assertStatus(201);
+        $this->assertSame($first->json('data.id'), $second->json('data.id'));
+        $this->assertDatabaseCount('reservations', 1);
+        $this->assertSame(0, $offer->fresh()->available_units);
+    }
+
     public function testItReturnsConflictWhenNoUnitsAvailable(): void
     {
         $offer = Offer::factory()->create(['available_units' => 0]);

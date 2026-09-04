@@ -33,6 +33,20 @@ class CreateReservationUseCaseTest extends TestCase
         $this->assertSame(1, $offer->fresh()->available_units);
     }
 
+    public function testItIsIdempotentByClientReference(): void
+    {
+        $offer = Offer::factory()->create(['available_units' => 2]);
+        $attributes = $this->reservationAttributes(['client_reference' => 'web-order-dup-1']);
+
+        $useCase = $this->app->make(CreateReservationUseCase::class);
+        $first = $useCase->handle($offer, $attributes);
+        $second = $useCase->handle($offer, $attributes);
+
+        $this->assertSame($first->id, $second->id);
+        $this->assertDatabaseCount('reservations', 1);
+        $this->assertSame(1, $offer->fresh()->available_units);
+    }
+
     public function testItThrowsWhenNoUnitsAvailable(): void
     {
         $offer = Offer::factory()->create(['available_units' => 0]);
