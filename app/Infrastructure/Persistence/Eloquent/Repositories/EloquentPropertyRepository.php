@@ -5,6 +5,7 @@ namespace App\Infrastructure\Persistence\Eloquent\Repositories;
 use App\Application\Imports\Ports\PropertyRepository;
 use App\Infrastructure\Persistence\Eloquent\Models\Property;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 class EloquentPropertyRepository implements PropertyRepository
@@ -14,7 +15,19 @@ class EloquentPropertyRepository implements PropertyRepository
      */
     public function findOrCreateByCode(string $code, array $attributes): Property
     {
-        return Property::query()->firstOrCreate(['code' => $code], $attributes);
+        $existing = Property::query()->where('code', $code)->first();
+
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        try {
+            return Property::query()->create(collect($attributes)->merge(['code' => $code])->all());
+        } catch (UniqueConstraintViolationException $e) {
+            // Гонка: два офери з однаковим property.code обробляються паралельно
+            // (різні Job/воркери) — C3 мусить триматись і в цьому вікні.
+            return Property::query()->where('code', $code)->first() ?? throw $e;
+        }
     }
 
     /**
