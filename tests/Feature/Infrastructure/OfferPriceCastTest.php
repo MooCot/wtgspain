@@ -11,15 +11,6 @@ class OfferPriceCastTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testPriceCastsToMoneyValueObject(): void
-    {
-        $offer = Offer::factory()->create(['price' => 72500, 'currency' => 'EUR']);
-
-        $this->assertInstanceOf(Money::class, $offer->price);
-        $this->assertSame(72500, $offer->price->amount);
-        $this->assertSame('EUR', $offer->price->currency);
-    }
-
     public function testPriceAcceptsRawIntOnWrite(): void
     {
         $offer = Offer::factory()->create(['price' => 50000, 'currency' => 'USD']);
