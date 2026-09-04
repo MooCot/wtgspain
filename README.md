@@ -29,6 +29,8 @@ docker compose exec app php artisan db:seed
 
 **Swagger UI** (інтерактивне тестування API): `http://localhost:8080/api/documentation`. Схема автогенерується з PHP-атрибутів у контролерах (`darkaonline/l5-swagger`); `L5_SWAGGER_GENERATE_ALWAYS=true` у `.env` тримає її актуальною при кожному запиті в dev-режимі. Ручна регенерація: `docker compose exec app php artisan l5-swagger:generate`.
 
+> Якщо `/docs` чи `/api/documentation` раптом віддає 404 — ймовірно, `storage/api-docs/` створився під `root` (наприклад після ручного `docker compose exec app ...` без `--user www-data`), а php-fpm-воркер пише як `www-data`. Фікс: `docker compose exec app chown -R www-data:www-data storage/api-docs` (або просто `docker compose restart app` — `docker-entrypoint.sh` перевстановлює права на весь `storage/` при старті).
+
 ## Команди
 
 | Дія | Команда |
