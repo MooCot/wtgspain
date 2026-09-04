@@ -12,11 +12,12 @@ REST API на Laravel для тестового завдання: асинхро
 
 ## Стек
 
-- PHP 8.2+
-- Laravel 11 або 12
-- MySQL 8+
-- Черга: **Redis**
-- **Docker Compose (власний, з нуля)** — сервіси: `app` (php-fpm 8.2+), `nginx`, `mysql`, `redis`, `queue` (той самий образ що app, `php artisan queue:work`)
+- **Laravel 12** (`^12.0`)
+- **PHP 8.3** (Laravel 12 вимагає мінімум `^8.2`, підтримує 8.2/8.3/8.4; пін на 8.3 — зрілий tooling-support для PHPStan/Larastan/GrumPHP)
+- **MySQL 8.0** (Laravel 12 офіційно вимагає 8.0+; частина функціоналу — functional indexes, JSON — потребує 8.0.16+)
+- **Redis 7** (черга; версія сервера не пінюється Laravel, клієнт — `predis` або `phpredis`)
+- **Nginx 1.27** (`nginx:1.27-alpine`; версія не прив'язана до PHP — спілкування по FastCGI, протокол version-agnostic)
+- **Docker Compose (власний, з нуля)** — сервіси: `app` (php:8.3-fpm), `nginx:1.27-alpine`, `mysql:8.0`, `redis:7-alpine`, `queue` (той самий образ що app, `php artisan queue:work`)
 
 ## Інструменти якості коду
 
