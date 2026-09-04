@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -27,5 +28,17 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (OfferUnavailableException $e, Request $request): JsonResponse {
             return response()->json(['message' => $e->getMessage()], 409);
+        });
+
+        // 404 (route model binding / route not found) — очікувана частина API-
+        // контракту, не неочікуваний збій, тому завжди чисте тіло, незалежно
+        // від APP_DEBUG (який інакше додає повний stack trace в JSON теж, не
+        // лише в HTML-сторінку помилки).
+        $exceptions->render(function (NotFoundHttpException $e, Request $request): ?JsonResponse {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            return response()->json(['message' => 'Not found.'], 404);
         });
     })->create();

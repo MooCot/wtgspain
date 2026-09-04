@@ -57,6 +57,14 @@ class ReservationsEndpointTest extends TestCase
         $response->assertStatus(404);
     }
 
+    public function testItReturnsCleanBodyOn404RegardlessOfAppDebug(): void
+    {
+        $response = $this->postJson('/api/offers/999999/reservations', $this->reservationPayload());
+
+        $response->assertStatus(404);
+        $response->assertExactJson(['message' => 'Not found.']);
+    }
+
     public function testItReturnsJsonValidationErrorsEvenWithoutAcceptHeader(): void
     {
         $offer = Offer::factory()->create(['available_units' => 2]);
