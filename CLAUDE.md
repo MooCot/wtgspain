@@ -31,6 +31,8 @@ composer require --dev phpstan/phpstan larastan/larastan phpro/grumphp
 ./vendor/bin/grumphp git:init
 ```
 
+**API-документація:** [darkaonline/l5-swagger](https://github.com/DarkaOnLine/L5-Swagger) (обгортка над `zircote/swagger-php`) — Swagger UI на `/api/documentation`, JSON-схема на `/docs`, генерується з PHP-атрибутів (`#[OA\...]`) прямо на контролерах. `L5_SWAGGER_GENERATE_ALWAYS=true` у `.env` — автогенерація в dev, без ручного `artisan l5-swagger:generate`.
+
 ## Сутності (проектування структури — на розсуд)
 
 - **Supplier** — постачальник пропозицій

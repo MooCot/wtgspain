@@ -27,6 +27,8 @@ docker compose exec app php artisan db:seed
 
 Застосунок доступний на `http://localhost:8080`.
 
+**Swagger UI** (інтерактивне тестування API): `http://localhost:8080/api/documentation`. Схема автогенерується з PHP-атрибутів у контролерах (`darkaonline/l5-swagger`); `L5_SWAGGER_GENERATE_ALWAYS=true` у `.env` тримає її актуальною при кожному запиті в dev-режимі. Ручна регенерація: `docker compose exec app php artisan l5-swagger:generate`.
+
 ## Команди
 
 | Дія | Команда |
