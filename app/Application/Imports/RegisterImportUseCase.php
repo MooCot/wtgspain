@@ -15,9 +15,9 @@ class RegisterImportUseCase
     ) {}
 
     /**
-     * Ідемпотентно реєструє Import — C1. Повертає існуючий Import без побічних
-     * ефектів, якщо (supplier, external_import_id) вже зустрічались:
-     * `$import->wasRecentlyCreated` каже викликачу, чи ставити Job у чергу.
+     * Idempotently registers an Import. Returns the existing Import with no
+     * side effects if (supplier, external_import_id) has already been seen:
+     * `$import->wasRecentlyCreated` tells the caller whether to dispatch the Job.
      */
     public function handle(string $supplierCode, string $externalImportId, string $sentAt): Import
     {

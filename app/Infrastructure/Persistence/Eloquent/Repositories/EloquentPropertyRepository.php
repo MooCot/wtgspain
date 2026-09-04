@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class EloquentPropertyRepository implements PropertyRepository
 {
-    /**
-     * Спільний, наперед відомий тег — не пряме посилання на цей клас з інших
-     * репозиторіїв. OfferRepository лише фляшить тег за назвою, не викликає
-     * PropertyRepository напряму.
-     */
     public const SEARCH_CACHE_TAG = 'properties:search';
 
     /**
@@ -45,9 +40,6 @@ class EloquentPropertyRepository implements PropertyRepository
         $criteria = collect($criteria);
         $cacheKey = 'properties:search:'.md5(json_encode($criteria->sortKeys()->all()));
 
-        // Активна інвалідація тегом (не голий TTL): OfferRepository фляшить
-        // SEARCH_CACHE_TAG на кожен запис у available_units/price. TTL нижче —
-        // лише страхувальна сітка на випадок запису в обхід репозиторію.
         return Cache::tags([self::SEARCH_CACHE_TAG])->remember($cacheKey, now()->addMinutes(5), function () use ($criteria) {
             $ranked = DB::table('offers')
                 ->join('properties', 'properties.id', '=', 'offers.property_id')

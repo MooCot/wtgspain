@@ -43,9 +43,6 @@ class PropertySearchCacheTest extends TestCase
         $first = $repository->searchWithBestOffer($this->searchCriteria());
         $this->assertCount(1, $first->items());
 
-        // Пряма мутація в обхід репозиторію — інвалідація тег-based її не бачить,
-        // це очікувана межа стратегії (не безмежний TTL-захист, а явна перевірка,
-        // що інвалідація прив'язана саме до наших repository-методів письма).
         DB::table('offers')->update(['available_units' => 0]);
 
         $second = $repository->searchWithBestOffer($this->searchCriteria());
