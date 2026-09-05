@@ -106,6 +106,31 @@ class PropertySearchRepositoryTest extends TestCase
         $this->assertSame($supplierB->code, $result->items()[0]->supplierCode);
     }
 
+    public function testItDefaultsToPageOneAndFifteenPerPageWhenOmitted(): void
+    {
+        $repository = $this->app->make(PropertyRepository::class);
+        $supplier = Supplier::factory()->create();
+
+        for ($i = 0; $i < 16; $i++) {
+            $property = Property::factory()->create();
+            Offer::factory()->for($supplier)->for($property)->create([
+                'check_in' => '2026-10-10',
+                'check_out' => '2026-10-15',
+                'max_guests' => 4,
+                'available_units' => 2,
+                'expires_at' => now()->addDays(5),
+            ]);
+        }
+
+        $criteria = collect($this->searchCriteria())->except(['page', 'per_page'])->all();
+
+        $result = $repository->searchWithBestOffer($criteria);
+
+        $this->assertSame(1, $result->currentPage());
+        $this->assertSame(15, $result->perPage());
+        $this->assertCount(15, $result->items());
+    }
+
     public function testItFiltersByCityWhenProvided(): void
     {
         $repository = $this->app->make(PropertyRepository::class);

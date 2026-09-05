@@ -74,6 +74,67 @@ class PropertySearchCacheTest extends TestCase
         $this->assertCount(0, $second->items());
     }
 
+    public function testCacheIsInvalidatedWhenNewOfferIsCreatedViaRepository(): void
+    {
+        $propertyRepository = $this->app->make(PropertyRepository::class);
+        $offerRepository = $this->app->make(OfferRepository::class);
+        $supplier = Supplier::factory()->create();
+        $property = Property::factory()->create();
+
+        $first = $propertyRepository->searchWithBestOffer($this->searchCriteria());
+        $this->assertCount(0, $first->items());
+
+        $offerRepository->updateOrCreate($supplier, $property, 'offer-new', [
+            'check_in' => '2026-10-10',
+            'check_out' => '2026-10-15',
+            'max_guests' => 4,
+            'price' => 50000,
+            'currency' => 'EUR',
+            'available_units' => 2,
+            'expires_at' => now()->addDays(5),
+        ]);
+
+        $second = $propertyRepository->searchWithBestOffer($this->searchCriteria());
+
+        $this->assertCount(1, $second->items());
+    }
+
+    public function testCacheIsNotInvalidatedByNoOpDecrement(): void
+    {
+        $propertyRepository = $this->app->make(PropertyRepository::class);
+        $offerRepository = $this->app->make(OfferRepository::class);
+        $supplier = Supplier::factory()->create();
+
+        $propertyA = Property::factory()->create();
+        $offerA = Offer::factory()->for($supplier)->for($propertyA)->create([
+            'check_in' => '2026-10-10',
+            'check_out' => '2026-10-15',
+            'max_guests' => 4,
+            'available_units' => 2,
+            'expires_at' => now()->addDays(5),
+        ]);
+
+        $propertyB = Property::factory()->create();
+        $offerB = Offer::factory()->for($supplier)->for($propertyB)->create([
+            'check_in' => '2026-10-10',
+            'check_out' => '2026-10-15',
+            'max_guests' => 4,
+            'available_units' => 0,
+            'expires_at' => now()->addDays(5),
+        ]);
+
+        $first = $propertyRepository->searchWithBestOffer($this->searchCriteria());
+        $this->assertCount(1, $first->items());
+
+        DB::table('offers')->where('id', $offerA->id)->update(['available_units' => 0]);
+
+        $offerRepository->decrementAvailableUnits($offerB);
+
+        $second = $propertyRepository->searchWithBestOffer($this->searchCriteria());
+
+        $this->assertCount(1, $second->items());
+    }
+
     public function testDifferentCriteriaAreNotCachedTogether(): void
     {
         $repository = $this->app->make(PropertyRepository::class);
