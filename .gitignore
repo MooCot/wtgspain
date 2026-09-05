@@ -27,6 +27,7 @@ Thumbs.db
 # кеш інструментів якості коду
 .deptrac.cache
 /storage/framework/phpstan
+/.composer
 
 # згенерована OpenAPI-схема (php artisan l5-swagger:generate)
 /storage/api-docs

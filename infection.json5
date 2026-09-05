@@ -1,0 +1,17 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": [
+            "app/Application",
+            "app/Infrastructure/Persistence/Eloquent/Repositories",
+            "app/Infrastructure/Persistence/Eloquent/Models/Casts"
+        ]
+    },
+    "logs": {
+        "text": "infection.log"
+    },
+    "timeout": 60,
+    "mutators": {
+        "@default": true
+    }
+}
